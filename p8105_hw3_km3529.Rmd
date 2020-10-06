@@ -5,5 +5,141 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse) 
+library(p8105.datasets)
 
+knitr::opt_chunk$set(
+  fig.width = 6, 
+  fig.asp = .6, 
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis", 
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
+
+
+## Problem 0 
+
+```{r}
+data("instacart") 
+```
+
+This datset contains  `r nrow(instacart)` rows and xolumns. 
+observations are at the level of items in orders by users 
+
+
+How many aisles, ane which are most items from? 
+essentially a counting question 
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  arrange(desc(n))
+```
+
+134 aisles 
+1067 items come from air fresheners and candles 
+ararnge lets you see where most are coming form 
+
+
+
+let's a make a plot 
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point()
+```
+hard to read soo 
+
+deal with x axis so rotate x axis labels
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+now let's put in an order that makes sense. 
+ggplot put it from alphabetical. 
+  - least common to most common 
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  mutate(
+    aisle = factor(aisle), 
+    aisle = fct_reorder(aisle, n) 
+  ) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+
+let's make a table
+```{r}
+instacart %>% 
+  filter(aisle %in%  c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  group_by(aisle) %>% 
+  count(product_name) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 4) %>% 
+  arrange(aisle, rank) %>% 
+  knitr::kable()
+```
+
+group by goes before count
+the mutate line
+  - using min_rank on n puts thigns in reverse order (smallest to largest)
+  - descending does reverse order
+  - 
+
+%in% is this in this? 
+
+
+
+
+
+
+
+pinkl ady apple and coffee ice cream 
+
+```{r}
+instacart %>% 
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
+  group_by(product_name, order_dow) %>% 
+  summarize(mean_hour = mean(order_hour_of_day)) %>% 
+  pivot_wider(
+    names_from = order_dow, 
+    values_from = mean_hour
+  )
+```
+
+
+
+## Problem 2
+
+not tidy 
+add variable 
+```{r}
+read_csv("./")
+```
+
+group by and summarize. then  make a table you would summarize 
+
+
+
+
+
+
