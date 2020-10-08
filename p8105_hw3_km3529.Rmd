@@ -91,23 +91,57 @@ instacart %>%
 
 
 ## Problem 2
+Accelerometers have become an appealing alternative to self-report techniques for studying physical activity in observational studies and clinical trials, largely because of their relative objectivity. 
 
-not tidy 
-add variable 
+During observation periods, the devices measure “activity counts” in a short period; one-minute intervals are common. Because accelerometers can be worn comfortably and unobtrusively, they produce around-the-clock observations.
+
+This problem uses five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The data can be downloaded here. In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
+
+
+Notes: 
+  - 5 weeks of data 
+  - activity_ : activity counts for each minute of a 24 hour day 
+  
+Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+
+load + tidy 
+useful names 
+weekday and weekend variable --> add variable (weekend v week day) 
+Encode data with reasonable variable classes. --> might not make sense now but will make sense as work on later problems 
+  - are activity counts going to be number? 
+  - min going to be num? 
+  - day of week going to be char or factor? if factor, in order that is reasonable? 
+
+
 ```{r}
-read_csv("./")
+accel_df = 
+  read_csv("./Data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+      activity_1:activity_1440, 
+      names_to = "minute",
+      names_prefix = "activity_", 
+      values_to = "activity_count") %>% 
+  mutate(
+    day_type = case_when(
+        day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "weekday", 
+        day %in% c("Saturday", "Sunday") ~ "weekend", 
+        TRUE ~ "") , 
+    activity_count = as.numeric(activity_count), 
+    day = as.factor(day), 
+    minute = as.numeric(minute), 
+    day = forcats::fct_relevel(
+        day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+    )
+
+#just to check day_type var
+accel_df %>% 
+  distinct(day_type, )
 ```
 
-group by and summarize. then  make a table you would summarize 
-
-*review recording 
-
-might need to use factor to change order 
-
-when you get to bullet 3: 
+SUMMARY HERE 
 
 
-## problem 
 
 
 
