@@ -104,15 +104,6 @@ Notes:
   
 Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
 
-load + tidy 
-useful names 
-weekday and weekend variable --> add variable (weekend v week day) 
-Encode data with reasonable variable classes. --> might not make sense now but will make sense as work on later problems 
-  - are activity counts going to be number? 
-  - min going to be num? 
-  - day of week going to be char or factor? if factor, in order that is reasonable? 
-
-
 ```{r}
 accel_df = 
   read_csv("./Data/accel_data.csv") %>% 
@@ -143,8 +134,23 @@ SUMMARY HERE
 
 
 
+Traditional analyses of accelerometer data focus on the total activity over the day. 
+Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+```{r}
+accel_df %>% 
+  group_by(day, week) %>% 
+  summarize(daily_activity = sum(activity_count)) %>% 
+  pivot_wider(
+      names_from = week, 
+      values_from = daily_activity) %>% 
+  knitr::kable(digits = 1)
+```
+TRENDS????
+weeks 2 and three hav e alot of activity? 
 
 
+Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
+```{r}
 
-
+```
 
