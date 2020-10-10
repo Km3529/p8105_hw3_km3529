@@ -143,10 +143,9 @@ accel_df %>%
 
 Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 ```{r}
-# this works 
-accel_df %>% 
-  ggplot(aes(x = minute, y = activity_count, color = day)) + 
-  geom_line(alpha = .5) + 
+#accel_df %>% 
+  #ggplot(aes(x = minute, y = activity_count, color = day)) + 
+ # geom_line(alpha = .5) + 
 
 #add title to Plot
 #notes: geom smooth?
@@ -174,6 +173,7 @@ ny_noaa =
   ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   mutate(
+    year = factor(year), 
     tmax = as.integer(tmax), 
     tmin = as.integer(tmin), 
     prcp = prcp/10, 
@@ -197,15 +197,17 @@ ny_noaa %>%
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
 ```{r}
+ny_noaa %>% 
+  filter(month %in% c("1", "7")) %>% 
+  group_by(month, year, id) %>% 
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = mean_tmax, group = id)) + 
+    geom_point(size = .5) +
+    geom_path(alpha = .5, size = .1) + 
+    facet_grid(.~month) + 
+    theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1))
 
 
-
-# select 
-# group
-# filter (mon in jan july)
-# drop_na
-# summarize 
-# plot 
 ```
 
 
@@ -214,11 +216,11 @@ Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a
 ```{r}
 #Plot 1
 
-ny_noaa_df %>% 
-  select(year, tmax, tmin)  %>% 
-  drop_na() %>% 
-  ggplot(aes(x = "tmax", y = "tmin")) + 
-  geom_bin2d()
+#ny_noaa_df %>% 
+  #select(year, tmax, tmin)  %>% 
+ # drop_na() %>% 
+ # ggplot(aes(x = "tmax", y = "tmin")) + 
+ # geom_bin2d()
   
 
 
