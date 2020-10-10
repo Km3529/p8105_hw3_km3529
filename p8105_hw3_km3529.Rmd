@@ -171,7 +171,9 @@ ny_noaa %>%
   mutate(rank = min_rank(desc(n))) %>% 
   filter(rank < 10)
 ```
+
 The most commonly observed values for snowfall was 0mm since New York only snows during the winter. Other common values were 25mm, 38mm, and 13mm. These are also quite small since New York does not get very much snow per day. 
+
 
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
@@ -189,6 +191,7 @@ ny_noaa %>%
       title = "Average Max Temperature for in January and July Across Stations", 
       y = "Average Temperature (C)")
 ```
+
 
 From this plot, July is much warmer than January every year. January of 1982 had one very cold day. The years 1994, 2003, and 2004 are colder than the others. There is an outlier from July of 1988 that is close to the January maximum temperature range. There is a slight shift in July temperatures warming as the years pass. There is more variabiilty of average maximum temperatures in January compared to July. We generally see some stations are consistent from year to year, especially when looking at the the January data for stations who report higher temperatures. 
 
