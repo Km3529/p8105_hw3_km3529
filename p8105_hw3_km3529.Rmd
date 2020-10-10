@@ -143,9 +143,9 @@ accel_df %>%
 
 Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 ```{r}
-#accel_df %>% 
-  #ggplot(aes(x = minute, y = activity_count, color = day)) + 
- # geom_line(alpha = .5) + 
+accel_df %>% 
+  ggplot(aes(x = minute, y = activity_count, color = day)) + 
+ geom_line(alpha = .5) 
 
 #add title to Plot
 #notes: geom smooth?
@@ -180,7 +180,6 @@ ny_noaa =
     tmax = tmax/10, 
     tmin = tmin/10
   )
-    
 ```
 prcp is measured in mm (originally measured in tenths of mm) 
 tmin/tmax are in degrees celcius (originally measured in tenth of degree) 
@@ -209,20 +208,36 @@ ny_noaa %>%
 
 
 ```
-
+can you see global warming? 
+are some stations always colder? 
 
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
-```{r}
+```{r, fig.height=5, fig.width=10}
 #Plot 1
+tmin_tmax_p = 
+  ny_noaa %>% 
+    drop_na(tmin, tmax) %>% 
+    ggplot(aes(x = tmax, y = tmin)) + 
+    geom_hex() + 
+    labs(
+      title = "Maximum Temperature v Minimum Temperature", 
+      x = "Maximum Temperature Per Day", 
+      y = "Minimum Temperature Per Day" )
 
-#ny_noaa_df %>% 
-  #select(year, tmax, tmin)  %>% 
- # drop_na() %>% 
- # ggplot(aes(x = "tmax", y = "tmin")) + 
- # geom_bin2d()
-  
+#plot 2
+snow_p = 
+  ny_noaa %>% 
+  drop_na(snow) %>% 
+  filter(snow < 100) %>% 
+  filter(snow > 0 ) %>% 
+    ggplot(aes(x = year, y = snow)) + 
+    geom_violin(alpha = .5) + 
+    theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1)) +   labs(
+      title = "Snowfall by Year"
+    )
 
+tmin_tmax_p + snow_p
 
 ```
 
