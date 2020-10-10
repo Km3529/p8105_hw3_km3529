@@ -28,9 +28,7 @@ scale_fill_discrete = scale_fill_viridis_d
 ```{r}
 data("instacart")
 ```
-This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. 
-
-Observations are the level of items in orders by user. There are user and order variables such as user ID, order ID, order day, and order hour. There are also item variables such as product name, aisle, department, whether the item has been ordered before, and some numeric codes. 
+This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Observations are the level of items in orders by user. There are user and order variables such as user ID, order ID, order day, and order hour. There are also item variables such as product name, aisle, department, whether the item has been ordered before, and some numeric codes. 
 
 
 How many aisles are there, and which aisles are the most items ordered from?
@@ -41,10 +39,7 @@ instacart %>%
 ```
 
 
-Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
-
-NOTE: cat var will be ordered numerically --> change to factor 
-
+Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. 
 ```{r}
 instacart %>% 
   count(aisle) %>% 
@@ -87,18 +82,9 @@ instacart %>%
 ```
 
 
-
-
-
 ## Problem 2
 
-
-
-This problem uses five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The data can be downloaded here. In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
-
-
 Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
-
 ```{r}
 accel_df = 
   read_csv("./Data/accel_data.csv") %>% 
@@ -121,9 +107,7 @@ accel_df =
     )
 ```
 
-SUMMARY HERE 
-  - During observation periods, the devices measure “activity counts” in a short period; one-minute intervals   are common. Because accelerometers can be worn comfortably and unobtrusively, they produce                    around-the-clock observations.
-  - 5 weeks of data 
+This dataset contains values from a 63 year old male's accelerometer , a small, unobtrusive device that measures activity. This data captures values from his accelerometer over 5 weeks. This accelerometer measures activity counts per minute, providing around the clock activity levels. There are `r nrow(accel_df)` rows and `r ncol(accel_df)` columns in this dataset. In addition to activity count measured each minute, other key variables include  week number, day in the observation period, day of the week, and whether it was a weekend or weekday. 
 
 
 Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
@@ -136,38 +120,33 @@ accel_df %>%
       values_from = daily_activity) %>% 
   knitr::kable(digits = 1)
 ```
-
-  - TRENDS????
-  - weeks 2 and three hav e alot of activity? 
+The patient's activity varies quite a bit. For example, the two Saturdays at the end of the observation period have a very low activity count, while Saturday of week 2 had a very high activity count. Weeks 2 and 3 have higher activity compared to the others. 
 
 
 Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 ```{r}
 accel_df %>% 
   ggplot(aes(x = minute, y = activity_count, color = day)) + 
- geom_line(alpha = .5) 
-
-#add title to Plot
-#notes: geom smooth?
-# should have 35 lines? 
-## get thrity five lines
+ geom_line(alpha = .5) + 
+  geom_smooth(alpha = .5) + 
+  labs(
+    title = "Activity Over the Day", 
+    x = "Minute of the Day", 
+    y = "Activity Count"
+  )
 ```
-
+This plot shows the patient's activity throughout the course of the day by day of the week. The first 400 minutes of the day are very low activity across all days of the week, which suggests this is when the patient sleeps. The patient generally wakes up around 7:00 am (400 minutes), which is when activity count begins to increase each day.  Weekdays generally follow similar activity patterns, which may suggest a consistent weekday schedule due to work or school. There is a slight increase on activity Sunday mornings and Friday evenings. The patient is most active during the weeks. 
 
 
 ## Problem 3 
 This problem uses the NY NOAA data. DO NOT include this dataset in your local data directory; instead, load the data from the p8105.datasets package using:
-```{r}
+```{r loading data}
 library(p8105.datasets)
 data("ny_noaa")
 ```
  
-WRITE DESCRIPTION
 
-  - The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. 
-  - Then, do or answer the following (commenting on the results of each):
-
-Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. 
+The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each). Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units.
 ```{r}
 ny_noaa = 
   ny_noaa %>% 
@@ -181,17 +160,17 @@ ny_noaa =
     tmin = tmin/10
   )
 ```
-prcp is measured in mm (originally measured in tenths of mm) 
-tmin/tmax are in degrees celcius (originally measured in tenth of degree) 
+This dataset was taken from NOAA, which contains weather and climate records from over 100,000 stations across 180 countries and territories. This subset from NOAA is on New York between the years of 1981 to 2010. There are `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. This datset contains values on station, date, daily precipitation (mm), snowfall (mm), and daily minimum/maximum temperatures (C). 
 
 For snowfall, what are the most commonly observed values? Why?
 ```{r}
 ny_noaa %>% 
-  drop_na(snwd) %>% 
-  count(snwd) %>% 
+  drop_na(snow) %>% 
+  count(snow) %>% 
   mutate(rank = min_rank(desc(n))) %>% 
   filter(rank < 10)
 ```
+The most commonly observed values for snowfall was 0mm since New York only snows during the winter. Other common values were 25mm, 38mm, and 13mm. These are also quite small since New York does not get very much snow per day. 
 
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
@@ -204,12 +183,13 @@ ny_noaa %>%
     geom_point(size = .5) +
     geom_path(alpha = .5, size = .1) + 
     facet_grid(.~month) + 
-    theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1))
-
-
+    theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1)) +
+    labs(
+      title = "Average Max Temperature for in January and July Across Stations", 
+      y = "Average Temperature (C)")
 ```
-can you see global warming? 
-are some stations always colder? 
+From this plot, July is much warmer than January every year. January of 1982 has one very cold day. The years 1994, 2003, and 2004 are colder than the others. There is an outlier from July of 1988 that is close to the January maximum temperature range. There is a slight shift in July temperatures warming as the years pass. There is more variabiilty of average maximum temperatures in January compared to July. We generally see some stations are consistent from year to year, especially when looking at the the January data for stations who report higher temperatures. 
+
 
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
@@ -222,8 +202,9 @@ tmin_tmax_p =
     geom_hex() + 
     labs(
       title = "Maximum Temperature v Minimum Temperature", 
-      x = "Maximum Temperature Per Day", 
-      y = "Minimum Temperature Per Day" )
+      x = "Maximum Temperature Per Day (C)", 
+      y = "Minimum Temperature Per Day (C)",  
+      caption = "from ny_noaa data set between the years of 1981 to 2010")
 
 #plot 2
 snow_p = 
@@ -234,7 +215,10 @@ snow_p =
     ggplot(aes(x = year, y = snow)) + 
     geom_violin(alpha = .5) + 
     theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 1)) +   labs(
-      title = "Snowfall by Year"
+      title = "Snowfall by Year", 
+      x = "year", 
+      y = "snowfall (mm)", 
+      caption = "from ny_noaa data set when snowfall is between 0-100mm"
     )
 
 tmin_tmax_p + snow_p
