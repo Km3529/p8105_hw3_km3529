@@ -7,6 +7,7 @@ output: github_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(p8105.datasets)
+library(patchwork)
 knitr::opts_chunk$set(
 	fig.width = 6, 
   fig.asp = .6,
@@ -42,7 +43,7 @@ instacart %>%
 
 Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
-note: cat var will be ordered numerically --> change to factor 
+NOTE: cat var will be ordered numerically --> change to factor 
 
 ```{r}
 instacart %>% 
@@ -83,7 +84,6 @@ instacart %>%
     names_from = order_dow, 
     values_from = mean_hour
   )
-  
 ```
 
 
@@ -91,17 +91,12 @@ instacart %>%
 
 
 ## Problem 2
-Accelerometers have become an appealing alternative to self-report techniques for studying physical activity in observational studies and clinical trials, largely because of their relative objectivity. 
 
-During observation periods, the devices measure “activity counts” in a short period; one-minute intervals are common. Because accelerometers can be worn comfortably and unobtrusively, they produce around-the-clock observations.
+
 
 This problem uses five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). The data can be downloaded here. In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
 
 
-Notes: 
-  - 5 weeks of data 
-  - activity_ : activity counts for each minute of a 24 hour day 
-  
 Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
 
 ```{r}
@@ -124,46 +119,40 @@ accel_df =
     day = forcats::fct_relevel(
         day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
     )
-
-#just to check day_type var
-accel_df %>% 
-  distinct(day_type, )
 ```
 
 SUMMARY HERE 
+  - During observation periods, the devices measure “activity counts” in a short period; one-minute intervals   are common. Because accelerometers can be worn comfortably and unobtrusively, they produce                    around-the-clock observations.
+  - 5 weeks of data 
 
 
-
-Traditional analyses of accelerometer data focus on the total activity over the day. 
-Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 ```{r}
 accel_df %>% 
   group_by(day, week) %>% 
   summarize(daily_activity = sum(activity_count)) %>% 
   pivot_wider(
-      names_from = week, 
+      names_from = day, 
       values_from = daily_activity) %>% 
   knitr::kable(digits = 1)
 ```
-TRENDS????
-weeks 2 and three hav e alot of activity? 
+
+  - TRENDS????
+  - weeks 2 and three hav e alot of activity? 
 
 
-Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
+Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 ```{r}
 # this works 
 accel_df %>% 
   ggplot(aes(x = minute, y = activity_count, color = day)) + 
-  geom_smooth(se = FALSE) 
+  geom_line(alpha = .5) + 
 
-
-### trying to make a mean variable? 
-accel_df %>% 
-  group_by(day)
-
+#add title to Plot
+#notes: geom smooth?
+# should have 35 lines? 
+## get thrity five lines
 ```
-
-
 
 
 
@@ -176,18 +165,65 @@ data("ny_noaa")
  
 WRITE DESCRIPTION
 
-The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
+  - The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. 
+  - Then, do or answer the following (commenting on the results of each):
 
-Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
-
+Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. 
 ```{r}
-ny_noaa 
+ny_noaa = 
+  ny_noaa %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+  mutate(
+    tmax = as.integer(tmax), 
+    tmin = as.integer(tmin), 
+    prcp = prcp/10, 
+    tmax = tmax/10, 
+    tmin = tmin/10
+  )
+    
+```
+prcp is measured in mm (originally measured in tenths of mm) 
+tmin/tmax are in degrees celcius (originally measured in tenth of degree) 
+
+For snowfall, what are the most commonly observed values? Why?
+```{r}
+ny_noaa %>% 
+  drop_na(snwd) %>% 
+  count(snwd) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 10)
+```
+
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+```{r}
+
+
+
+# select 
+# group
+# filter (mon in jan july)
+# drop_na
+# summarize 
+# plot 
 ```
 
 
 
-Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+```{r}
+#Plot 1
+
+ny_noaa_df %>% 
+  select(year, tmax, tmin)  %>% 
+  drop_na() %>% 
+  ggplot(aes(x = "tmax", y = "tmin")) + 
+  geom_bin2d()
+  
+
+
+```
+
 
 
 
